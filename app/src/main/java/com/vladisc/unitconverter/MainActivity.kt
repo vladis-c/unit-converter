@@ -1,7 +1,6 @@
 package com.vladisc.unitconverter
 
 import android.os.Bundle
-import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -25,6 +23,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -49,7 +49,22 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun UnitConverter() {
-    var value = ""
+    val inputValue = remember {
+        mutableStateOf("")
+    }
+    val firstSelectorIsOpen = remember {
+        mutableStateOf(false)
+    }
+    val secondSelectorIsOpen = remember {
+        mutableStateOf(false)
+    }
+    val firstUnit = remember {
+        mutableStateOf<Unit?>(null)
+    }
+    val secondUnit = remember {
+        mutableStateOf<Unit?>(null)
+    }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -58,80 +73,138 @@ fun UnitConverter() {
         Text(text = "Unit Converter")
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
-            value = value,
-            onValueChange = { value = it },
+            value = inputValue.value,
+            onValueChange = { inputValue.value = it },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
         Row {
             Box {
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "Select")
+                fun openFirstSelector() {
+                    firstSelectorIsOpen.value = true
+                }
+
+                fun closeFirstSelector() {
+                    firstSelectorIsOpen.value = false
+                }
+
+                fun setFirstUnit(unit: Unit) {
+                    firstUnit.value = unit
+                    closeFirstSelector()
+                }
+                Button(
+                    onClick = {
+                        openFirstSelector()
+                    }
+                ) {
+                    Text(text = firstUnit.value?.toString() ?: "From")
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
                         contentDescription = "Arrow Down"
                     )
                 }
-                DropdownMenu(expanded = true, onDismissRequest = { /*TODO*/ }) {
+                DropdownMenu(
+                    expanded = firstSelectorIsOpen.value,
+                    onDismissRequest = {
+                        closeFirstSelector()
+                    }
+                ) {
                     DropdownMenuItem(
                         text = {
-                            Text(text = "Millimeters")
+                            Text(text = Unit.MILLIMETERS.toString())
                         },
-                        onClick = { /*TODO*/ }
+                        onClick = {
+                            setFirstUnit(Unit.MILLIMETERS)
+                        }
                     )
                     DropdownMenuItem(
                         text = {
-                            Text(text = "Centimeters")
+                            Text(text = Unit.CENTIMETERS.toString())
                         },
-                        onClick = { /*TODO*/ }
+                        onClick = {
+                            setFirstUnit(Unit.CENTIMETERS)
+                        }
                     )
                     DropdownMenuItem(
                         text = {
-                            Text(text = "Meters")
+                            Text(text = Unit.METERS.toString())
                         },
-                        onClick = { /*TODO*/ }
+                        onClick = {
+                            setFirstUnit(Unit.METERS)
+                        }
                     )
                     DropdownMenuItem(
                         text = {
-                            Text(text = "Feet")
+                            Text(text = Unit.FEET.toString())
                         },
-                        onClick = { /*TODO*/ }
+                        onClick = {
+                            setFirstUnit(Unit.FEET)
+                        }
                     )
                 }
             }
             Spacer(modifier = Modifier.width(16.dp))
             Box {
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "Select")
+                fun openSecondSelector() {
+                    secondSelectorIsOpen.value = true
+                }
+
+                fun closeSecondSelector() {
+                    secondSelectorIsOpen.value = false
+                }
+
+                fun setSecondUnit(unit: Unit) {
+                    closeSecondSelector()
+                    secondUnit.value = unit
+                }
+                Button(
+                    onClick = {
+                        openSecondSelector()
+                    }
+                ) {
+                    Text(text = secondUnit.value?.toString() ?: "To")
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
                         contentDescription = "Arrow Down"
                     )
                 }
-                DropdownMenu(expanded = true, onDismissRequest = { /*TODO*/ }) {
+                DropdownMenu(
+                    expanded = secondSelectorIsOpen.value,
+                    onDismissRequest = {
+                        closeSecondSelector()
+                    }
+                ) {
                     DropdownMenuItem(
                         text = {
-                            Text(text = "Millimeters")
+                            Text(text = Unit.MILLIMETERS.toString())
                         },
-                        onClick = { /*TODO*/ }
+                        onClick = {
+                            setSecondUnit(Unit.MILLIMETERS)
+                        }
                     )
                     DropdownMenuItem(
                         text = {
-                            Text(text = "Centimeters")
+                            Text(text = Unit.CENTIMETERS.toString())
                         },
-                        onClick = { /*TODO*/ }
+                        onClick = {
+                            setSecondUnit(Unit.CENTIMETERS)
+                        }
                     )
                     DropdownMenuItem(
                         text = {
-                            Text(text = "Meters")
+                            Text(text = Unit.METERS.toString())
                         },
-                        onClick = { /*TODO*/ }
+                        onClick = {
+                            setSecondUnit(Unit.METERS)
+                        }
                     )
                     DropdownMenuItem(
                         text = {
-                            Text(text = "Feet")
+                            Text(text = Unit.FEET.toString())
                         },
-                        onClick = { /*TODO*/ }
+                        onClick = {
+                            setSecondUnit(Unit.FEET)
+                        }
                     )
                 }
             }

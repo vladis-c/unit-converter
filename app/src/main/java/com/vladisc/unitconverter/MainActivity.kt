@@ -23,6 +23,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -49,20 +51,51 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun UnitConverter() {
-    val inputValue = remember {
-        mutableStateOf("")
-    }
-    val firstSelectorIsOpen = remember {
-        mutableStateOf(false)
-    }
-    val secondSelectorIsOpen = remember {
-        mutableStateOf(false)
-    }
-    val firstUnit = remember {
-        mutableStateOf<Unit?>(null)
-    }
-    val secondUnit = remember {
-        mutableStateOf<Unit?>(null)
+    var inputValue by remember { mutableStateOf<String?>(null) }
+    val firstSelectorIsOpen = remember { mutableStateOf(false) }
+    val secondSelectorIsOpen = remember { mutableStateOf(false) }
+    val firstUnit = remember { mutableStateOf<Unit?>(null) }
+    val secondUnit = remember { mutableStateOf<Unit?>(null) }
+    val multiplier = remember { mutableStateOf<Double?>(null) }
+
+    fun setMultiplier(unit1: Unit?, unit2: Unit?): Double {
+        if (unit1 === Unit.MILLIMETERS && unit2 === Unit.CENTIMETERS) {
+            return 0.01
+        }
+        if (unit1 === Unit.MILLIMETERS && unit2 === Unit.METERS) {
+            return 0.0001
+        }
+        if (unit1 === Unit.MILLIMETERS && unit2 === Unit.FEET) {
+            return 0.00328084
+        }
+        if (unit1 === Unit.CENTIMETERS && unit2 === Unit.MILLIMETERS) {
+            return 10.00
+        }
+        if (unit1 === Unit.CENTIMETERS && unit2 === Unit.METERS) {
+            return 0.001
+        }
+        if (unit1 === Unit.CENTIMETERS && unit2 === Unit.FEET) {
+            return 0.0328084
+        }
+        if (unit1 === Unit.METERS && unit2 === Unit.CENTIMETERS) {
+            return 100.00
+        }
+        if (unit1 === Unit.METERS && unit2 === Unit.MILLIMETERS) {
+            return 1000.00
+        }
+        if (unit1 === Unit.METERS && unit2 === Unit.FEET) {
+            return 0.328084
+        }
+        if (unit1 === Unit.FEET && unit2 === Unit.MILLIMETERS) {
+            return 304.8
+        }
+        if (unit1 === Unit.FEET && unit2 === Unit.CENTIMETERS) {
+            return 30.48
+        }
+        if (unit1 === Unit.FEET && unit2 === Unit.METERS) {
+            return 0.3048
+        }
+        return 1.00
     }
 
     Column(
@@ -73,9 +106,9 @@ fun UnitConverter() {
         Text(text = "Unit Converter")
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
-            value = inputValue.value,
-            onValueChange = { inputValue.value = it },
-            modifier = Modifier.fillMaxWidth()
+            value = inputValue ?: "",
+            onValueChange = { inputValue = it },
+            modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(16.dp))
         Row {
@@ -90,12 +123,11 @@ fun UnitConverter() {
 
                 fun setFirstUnit(unit: Unit) {
                     firstUnit.value = unit
+                    setMultiplier(unit1 = unit, unit2 = secondUnit.value)
                     closeFirstSelector()
                 }
                 Button(
-                    onClick = {
-                        openFirstSelector()
-                    }
+                    onClick = { openFirstSelector() }
                 ) {
                     Text(text = firstUnit.value?.toString() ?: "From")
                     Icon(
@@ -105,41 +137,31 @@ fun UnitConverter() {
                 }
                 DropdownMenu(
                     expanded = firstSelectorIsOpen.value,
-                    onDismissRequest = {
-                        closeFirstSelector()
-                    }
+                    onDismissRequest = { closeFirstSelector() }
                 ) {
                     DropdownMenuItem(
                         text = {
                             Text(text = Unit.MILLIMETERS.toString())
                         },
-                        onClick = {
-                            setFirstUnit(Unit.MILLIMETERS)
-                        }
+                        onClick = { setFirstUnit(Unit.MILLIMETERS) }
                     )
                     DropdownMenuItem(
                         text = {
                             Text(text = Unit.CENTIMETERS.toString())
                         },
-                        onClick = {
-                            setFirstUnit(Unit.CENTIMETERS)
-                        }
+                        onClick = { setFirstUnit(Unit.CENTIMETERS) }
                     )
                     DropdownMenuItem(
                         text = {
                             Text(text = Unit.METERS.toString())
                         },
-                        onClick = {
-                            setFirstUnit(Unit.METERS)
-                        }
+                        onClick = { setFirstUnit(Unit.METERS) }
                     )
                     DropdownMenuItem(
                         text = {
                             Text(text = Unit.FEET.toString())
                         },
-                        onClick = {
-                            setFirstUnit(Unit.FEET)
-                        }
+                        onClick = { setFirstUnit(Unit.FEET) }
                     )
                 }
             }
@@ -154,13 +176,12 @@ fun UnitConverter() {
                 }
 
                 fun setSecondUnit(unit: Unit) {
-                    closeSecondSelector()
                     secondUnit.value = unit
+                    setMultiplier(unit1 = firstUnit.value, unit2 = unit)
+                    closeSecondSelector()
                 }
                 Button(
-                    onClick = {
-                        openSecondSelector()
-                    }
+                    onClick = { openSecondSelector() }
                 ) {
                     Text(text = secondUnit.value?.toString() ?: "To")
                     Icon(
@@ -170,46 +191,36 @@ fun UnitConverter() {
                 }
                 DropdownMenu(
                     expanded = secondSelectorIsOpen.value,
-                    onDismissRequest = {
-                        closeSecondSelector()
-                    }
+                    onDismissRequest = { closeSecondSelector() }
                 ) {
                     DropdownMenuItem(
                         text = {
                             Text(text = Unit.MILLIMETERS.toString())
                         },
-                        onClick = {
-                            setSecondUnit(Unit.MILLIMETERS)
-                        }
+                        onClick = { setSecondUnit(Unit.MILLIMETERS) }
                     )
                     DropdownMenuItem(
                         text = {
                             Text(text = Unit.CENTIMETERS.toString())
                         },
-                        onClick = {
-                            setSecondUnit(Unit.CENTIMETERS)
-                        }
+                        onClick = { setSecondUnit(Unit.CENTIMETERS) }
                     )
                     DropdownMenuItem(
                         text = {
                             Text(text = Unit.METERS.toString())
                         },
-                        onClick = {
-                            setSecondUnit(Unit.METERS)
-                        }
+                        onClick = { setSecondUnit(Unit.METERS) }
                     )
                     DropdownMenuItem(
                         text = {
                             Text(text = Unit.FEET.toString())
                         },
-                        onClick = {
-                            setSecondUnit(Unit.FEET)
-                        }
+                        onClick = { setSecondUnit(Unit.FEET) }
                     )
                 }
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Result:")
+        Text(text = "Result:${if (multiplier.value == null || inputValue == null) "" else "${multiplier.value!! * inputValue!!.toDouble()}"}")
     }
 }

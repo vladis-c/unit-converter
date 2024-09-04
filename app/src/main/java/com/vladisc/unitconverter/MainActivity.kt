@@ -23,8 +23,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -51,52 +49,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun UnitConverter() {
-    var inputValue by remember { mutableStateOf<String?>(null) }
+    val input = remember { mutableStateOf<String?>(null) }
     val firstSelectorIsOpen = remember { mutableStateOf(false) }
     val secondSelectorIsOpen = remember { mutableStateOf(false) }
     val firstUnit = remember { mutableStateOf<Unit?>(null) }
     val secondUnit = remember { mutableStateOf<Unit?>(null) }
-    val multiplier = remember { mutableStateOf<Double?>(null) }
-
-    fun setMultiplier(unit1: Unit?, unit2: Unit?): Double {
-        if (unit1 === Unit.MILLIMETERS && unit2 === Unit.CENTIMETERS) {
-            return 0.01
-        }
-        if (unit1 === Unit.MILLIMETERS && unit2 === Unit.METERS) {
-            return 0.0001
-        }
-        if (unit1 === Unit.MILLIMETERS && unit2 === Unit.FEET) {
-            return 0.00328084
-        }
-        if (unit1 === Unit.CENTIMETERS && unit2 === Unit.MILLIMETERS) {
-            return 10.00
-        }
-        if (unit1 === Unit.CENTIMETERS && unit2 === Unit.METERS) {
-            return 0.001
-        }
-        if (unit1 === Unit.CENTIMETERS && unit2 === Unit.FEET) {
-            return 0.0328084
-        }
-        if (unit1 === Unit.METERS && unit2 === Unit.CENTIMETERS) {
-            return 100.00
-        }
-        if (unit1 === Unit.METERS && unit2 === Unit.MILLIMETERS) {
-            return 1000.00
-        }
-        if (unit1 === Unit.METERS && unit2 === Unit.FEET) {
-            return 0.328084
-        }
-        if (unit1 === Unit.FEET && unit2 === Unit.MILLIMETERS) {
-            return 304.8
-        }
-        if (unit1 === Unit.FEET && unit2 === Unit.CENTIMETERS) {
-            return 30.48
-        }
-        if (unit1 === Unit.FEET && unit2 === Unit.METERS) {
-            return 0.3048
-        }
-        return 1.00
-    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -106,8 +63,8 @@ fun UnitConverter() {
         Text(text = "Unit Converter")
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
-            value = inputValue ?: "",
-            onValueChange = { inputValue = it },
+            value = input.value ?: "",
+            onValueChange = { input.value = it },
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -123,7 +80,6 @@ fun UnitConverter() {
 
                 fun setFirstUnit(unit: Unit) {
                     firstUnit.value = unit
-                    setMultiplier(unit1 = unit, unit2 = secondUnit.value)
                     closeFirstSelector()
                 }
                 Button(
@@ -177,7 +133,6 @@ fun UnitConverter() {
 
                 fun setSecondUnit(unit: Unit) {
                     secondUnit.value = unit
-                    setMultiplier(unit1 = firstUnit.value, unit2 = unit)
                     closeSecondSelector()
                 }
                 Button(
@@ -221,6 +176,6 @@ fun UnitConverter() {
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Result:${if (multiplier.value == null || inputValue == null) "" else "${multiplier.value!! * inputValue!!.toDouble()}"}")
+        Result(unit1 = firstUnit.value, unit2 = secondUnit.value, input = input.value)
     }
 }
